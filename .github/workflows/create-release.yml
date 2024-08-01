@@ -1,0 +1,36 @@
+name: Create Release
+on:
+  release:
+    types: [published]
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout project sources
+        uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Build and Publish to NPM
+        run: npm ci & npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Create Release
+        run: |
+          VERSION=$(jq -r '.version' package.json)
+          gh release create "v${VERSION}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --title "v${VERSION}" \
+            --generate-notes
+  prepare-next-version:
+    needs: build-and-publish
+    uses: ./.github/workflows/increment-npm-package-version.yml
+    secrets: inherit
+    permissions:
+      contents: write
+    with:
+      commit_message: "Preparing next version "
