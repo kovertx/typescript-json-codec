@@ -1,6 +1,6 @@
 {
   "name": "@kovertx/typescript-json-codec",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Structured JSON encoding and validation",
   "author": "patrick@pdh.sh",
   "license": "MIT",
